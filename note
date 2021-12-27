@@ -181,3 +181,4 @@ CUDA_VISIBLE_DEVICES=0,1 python train_val_my.py \
 
 
 test
+aaaaaa
