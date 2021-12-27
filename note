@@ -182,3 +182,9 @@ CUDA_VISIBLE_DEVICES=0,1 python train_val_my.py \
 
 test
 aaaaaa
+
+4、git add .
+
+5、git commit -m ""
+
+6、git push origin master（git push origin 本地分支名:refs/remotes/远程分支名）
