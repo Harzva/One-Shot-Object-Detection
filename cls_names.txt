@@ -1,0 +1,201 @@
+accordion
+airplane
+ant
+antelope
+apple
+armadillo
+artichoke
+axe
+baby bed
+backpack
+bagel
+balance beam
+banana
+band aid
+book
+baseball bat
+basketball
+baseball glove
+beaker
+bear
+bed
+bell pepper 
+bench
+bicycle
+binder
+bird
+boat
+bow tie
+bow
+bowl
+broccoli
+bottle
+bus
+butterfly
+cat
+can opener
+car
+carrot
+cake
+cello
+centipede
+chain saw
+chair
+chime
+clock
+coffee maker
+computer keyboard
+computer mouse
+cow
+cream
+croquet ball
+couch
+cucumber
+cup
+diaper
+dining table
+dishwasher
+dog
+donut
+dragonfly
+drum
+dumbbell
+electric fan
+elephant
+face powder
+fig
+fire hydrant
+flower pot
+flute
+fox
+french horn 
+fork  
+frisbee
+giant panda
+goldfish
+golf ball
+golfcart
+giraffe
+guitar
+hair drier
+handbag
+hamburger
+hammer
+hamster
+harmonica
+harp
+hat with a wide brim
+head cabbage
+helmet
+hippopotamus
+horizontal bar
+horse
+hot dog
+iPod
+isopod
+jellyfish
+keyboard
+ladle
+ladybug
+lamp
+laptop
+lemon
+lion
+lipstick
+lizard
+lobster
+maillot
+maraca
+cell phone
+microwave
+milk can
+miniskirt
+mouse
+motorcycle
+mushroom
+kite
+knife
+oven
+orange
+otter
+pencil box
+pencil sharpener
+perfume
+person
+piano
+pineapple
+parking meter
+pitcher
+pizza
+plastic bag
+plate rack
+pomegranate
+popsicle
+porcupine
+potted plant
+pretzel
+printer
+puck
+punching bag
+purse
+remote
+tennis racket
+ray
+red panda
+refrigerator
+remote control
+rubber eraser
+rugby ball
+ruler
+salt or pepper shaker
+sandwich
+scorpion
+scissors
+sink
+sheep
+skis
+skunk
+snail
+snake
+skateboard
+snowplow
+spoon 
+sports ball
+sofa
+spatula
+squirrel
+starfish
+stethoscope
+stove
+strainer
+surfboard
+snowboard
+suitcase
+stop sign
+swine  
+syringe
+table
+teddy bear
+tennis
+tick
+tie
+toilet
+toaster
+traffic light
+train
+toothbrush
+trumpet
+truck
+tv
+umbrella
+vase
+violin
+volleyball
+waffle iron
+washer
+water bottle
+watercraft
+whale
+wine glass
+zebra
+bg
