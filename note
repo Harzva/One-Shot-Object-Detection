@@ -179,6 +179,12 @@ CUDA_VISIBLE_DEVICES=0,1 python train_val_my.py \
 --cuda True --g 1 --seen 1   --mGPUs True --save_dir /home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/models/res50/voc/cls_test
 
 
+CUDA_VISIBLE_DEVICES=0,1 python train_val_my.py \
+--dataset coco --net res50 \
+--bs 16 --nw 4 \
+--cuda True --g 1 --seen 1   --mGPUs True --save_dir /home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/models/res50/coco/cls_coae
+
+
 
 test
 aaaaaa

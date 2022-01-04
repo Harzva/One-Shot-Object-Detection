@@ -152,7 +152,7 @@ class _fasterRCNN(nn.Module):
 
         if len(self.classes)==81:
             self.word_embs = nn.Embedding(201,500)
-            path_word_w2v='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/word_w2v.txt'
+            path_word_w2v='./word_w2v.txt'
             temp_data=data = np.zeros((500,201),dtype=np.float32)
             temp_word=read_weight(temp_data,path_word_w2v) 
             self.word_embs.weight.data.copy_(torch.from_numpy(temp_word))
@@ -160,7 +160,7 @@ class _fasterRCNN(nn.Module):
             self.trans1= nn.Linear(500 + 2048, 2048)
         elif len(self.classes)==21:
             self.word_embs = nn.Embedding(21,300)
-            path_word_w2v='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/glove.42B.300d_voc.txt'
+            path_word_w2v='./glove.42B.300d_voc.txt'
             temp_data=data = np.zeros((21,300),dtype=np.float32)
             temp_word=read_weight_voc(temp_data,path_word_w2v) 
             self.word_embs.weight.data.copy_(torch.from_numpy(temp_word))
@@ -169,7 +169,7 @@ class _fasterRCNN(nn.Module):
 
         
         # self.word_embs = nn.Embedding(201,500) if len(self.classes)==81 else nn.Embedding(21,500)
-        # path_word_w2v='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/word_w2v.txt' if len(classes)==81 else '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/glove.42B.300d_voc.txt'
+        # path_word_w2v='./word_w2v.txt' if len(classes)==81 else './glove.42B.300d_voc.txt'
         # temp_data=data = np.zeros((500,201),dtype=np.float32) if len(classes)==81 else np.zeros((300,20),dtype=np.float32) 
         # temp_word=read_weight(temp_data,path_word_w2v) 
         # self.word_embs.weight.data.copy_(torch.from_numpy(temp_word))

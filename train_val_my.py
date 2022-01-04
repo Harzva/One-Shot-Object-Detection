@@ -73,7 +73,7 @@ def parse_args():
                         default=10000, type=int)
 
     parser.add_argument('--save_dir', dest='save_dir',
-                        help='directory to save models', default="/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/models/res50/test/",
+                        help='directory to save models', default="./models/res50/test/",
                         type=str)
     parser.add_argument('--nw', dest='num_workers',
                         help='number of worker to load data',
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     # ===============
     # 获取词向量
     wi = {}
-    with open('/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/cls_names.txt') as f:
+    with open('./cls_names.txt') as f:
       for i, key in enumerate(f.readlines()):
         wi[key.strip()] = i
 

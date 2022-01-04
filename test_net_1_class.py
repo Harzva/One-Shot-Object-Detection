@@ -87,8 +87,11 @@ python test_net_1.py --dataset coco --net res50 \
   parser.add_argument('--set', dest='set_cfgs',
                       help='set config keys', default=None,
                       nargs=argparse.REMAINDER)
+  parser.add_argument('--save_dir', dest='save_dir',
+                        help='directory to save models', default="./models/res50/test/",
+                        type=str)
   parser.add_argument('--load_dir', dest='load_dir',
-                      help='directory to load models', default="/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/models/res50/coco/faster_rcnn_4_10_1663.pth",
+                      help='directory to load models', default="./models/res50/coco/faster_rcnn_4_10_1663.pth",
                       type=str)
   # parser.add_argument('--cuda', dest='cuda',
   #                     help='whether use CUDA',
@@ -119,7 +122,7 @@ python test_net_1.py --dataset coco --net res50 \
                       default=1663, type=int)#354981
   parser.add_argument('--m_path', dest='model_path',
                       help='checkpoint to load network',
-                      default='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/models/res50/voc/cls_pascal_voc_bs16_s1_g1/cls_1_10_548.pth', type=str)#354981
+                      default='./models/res50/voc/cls_pascal_voc_bs16_s1_g1/cls_1_10_548.pth', type=str)#354981
   parser.add_argument('--vis', dest='vis',
                       help='visualization mode',
                       action='store_true')
@@ -131,10 +134,16 @@ python test_net_1.py --dataset coco --net res50 \
                       default=1, type=int) 
   parser.add_argument('--pre_t', dest='pre_trained_path',
                       help='resume checkpoint or not',
-                      default='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar', type=str)
+                      default='./data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar', type=str)
   parser.add_argument('--word_embedding', dest='word_embedding', type=Tools.str2bool,
                       help='whether use multiple GPUs',
                       default=True)
+  parser.add_argument('--nw', dest='num_workers',
+                        help='number of worker to load data',
+                        default=32, type=int)
+  parser.add_argument('--bs', dest='batch_size',
+                        help='batch_size',
+                        default=6, type=int)
   args = parser.parse_args()
   return args
 
@@ -189,7 +198,7 @@ class Config(object):
   #    imdb, roidb, ratio_list, ratio_index, query, class_to_name = combined_roidb(args.imdb_name, True, seen=args.seen)
   imdb_vu.competition_mode(on=True)
   wi = {}
-  with open('/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/cls_names.txt') as f:
+  with open('./cls_names.txt') as f:
     for i, key in enumerate(f.readlines()):
       wi[key.strip()] = i
   dataset_vu = roibatchLoader(roidb_vu, ratio_list_vu, ratio_index_vu, query_vu, 1, imdb_vu.num_classes, training=False, seen=args.seen, class_to_name=class_to_name,word_name_to_index=wi)
