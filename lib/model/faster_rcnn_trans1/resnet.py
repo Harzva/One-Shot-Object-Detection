@@ -220,11 +220,11 @@ def resnet152(pretrained=False):
 class resnet(_fasterRCNN):
   def __init__(self, classes, num_layers=101, pretrained=False, class_agnostic=False):
     if num_layers==50:
-      self.model_path = '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar'
-      #self.model_path = '../data/pretrain_imagenet_resnet50/model_best.pth.tar'
+      self.pre_trained_path = './data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar'
+      #self.pre_trained_path = '../data/pretrain_imagenet_resnet50/model_best.pth.tar'
     elif num_layers==101:
-      self.model_path = '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/pretrain_imagenet_resnet101/model_best.pth.tar'
-      #self.model_path = '../data/pretrain_imagenet_resnet101/model_best.pth.tar'
+      self.pre_trained_path = './data/pre-trained/pretrain_imagenet_resnet101/model_best.pth.tar'
+      #self.pre_trained_path = '../data/pretrain_imagenet_resnet101/model_best.pth.tar'
     self.dout_base_model = 1024
     self.pretrained = pretrained
     self.class_agnostic = class_agnostic
@@ -239,8 +239,8 @@ class resnet(_fasterRCNN):
       resnet = resnet101()
 
     if self.pretrained == True:
-      print("Loading pretrained weights from %s" %(self.model_path))
-      state_dict = torch.load(self.model_path)
+      print("Loading pretrained weights from %s" %(self.pre_trained_path))
+      state_dict = torch.load(self.pre_trained_path)
       state_dict = state_dict['state_dict']
 
       state_dict_v2 = copy.deepcopy(state_dict)

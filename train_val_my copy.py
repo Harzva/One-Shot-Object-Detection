@@ -70,7 +70,7 @@ def parse_args():
                         default=10000, type=int)
 
     parser.add_argument('--save_dir', dest='save_dir',
-                        help='directory to save models', default="/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/models/res50/test/",
+                        help='directory to save models', default="./models/res50/test/",
                         type=str)
     parser.add_argument('--nw', dest='num_workers',
                         help='number of worker to load data',
@@ -140,7 +140,7 @@ def parse_args():
                         default=True)
     parser.add_argument('--pre_t', dest='pre_trained_path',
                         help='resume checkpoint or not',
-                        default='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar', type=str)
+                        default='./data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar', type=str)
     # parser.add_argument('--GPU_ID ', dest='GPU_ID',
     #                     help='resume checkpoint or not',
     #                     default='0,1', type=str)
@@ -262,7 +262,7 @@ if __name__ == '__main__':
         sampler_batch = sampler(train_size, args.batch_size)
 
         wi = {}
-        with open('/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/cls_names.txt') as f:
+        with open('./cls_names.txt') as f:
             for i, key in enumerate(f.readlines()):
                 wi[key.strip()] = i
 
@@ -337,16 +337,16 @@ if __name__ == '__main__':
 
     # initilize the network here.
     if args.net == 'vgg16':
-        fasterRCNN = vgg16(imdb.classes, pretrained=True, class_agnostic=args.class_agnostic,model_path=args.pre_trained_path)
+        fasterRCNN = vgg16(imdb.classes, pretrained=True, class_agnostic=args.class_agnostic,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res101':
         fasterRCNN = resnet(imdb.classes,101, pretrained=True,
-                            class_agnostic=args.class_agnostic,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res50':
         fasterRCNN = resnet(imdb.classes, 50, pretrained=True,
-                            class_agnostic=args.class_agnostic,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res152':
         fasterRCNN = resnet(imdb.classes, 152, pretrained=True,
-                            class_agnostic=args.class_agnostic,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,pre_trained_path=args.pre_trained_path)
     else:
         logger.info("network is not defined")
         pdb.set_trace()

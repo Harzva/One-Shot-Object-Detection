@@ -40,8 +40,10 @@ class coco(imdb):
     cats = self._COCO.loadCats(self._COCO.getCatIds())
     # class name
     self._classes = tuple(['__background__'] + [c['name'] for c in cats])
+    #print("self._classes",self._classes)
     # class name to ind    (0~80) 0= __background__
     self._class_to_ind = dict(list(zip(self.classes, list(range(self.num_classes)))))
+    #print("self._classes_to_ind",self._class_to_ind)
     # class name to cat_id (1~90) 1= person
     self._class_to_coco_cat_id = dict(list(zip([c['name'] for c in cats],
                                                self._COCO.getCatIds())))
@@ -51,11 +53,12 @@ class coco(imdb):
     self.coco_cat_id_to_class_ind = dict([(self._class_to_coco_cat_id[cls],
                                       self._class_to_ind[cls])
                                      for cls in self._classes[1:]])
+    #print("self.coco_cat_id_to_class_ind",self.coco_cat_id_to_class_ind)
     # 1~80 : 1~90
     self.coco_class_ind_to_cat_id = dict([(self._class_to_ind[cls],
                                       self._class_to_coco_cat_id[cls])
                                      for cls in self._classes[1:]])
-
+    #print("coco_class_ind_to_cat_id:",self.coco_class_ind_to_cat_id)
     self._image_index = self._load_image_set_index()
 
 

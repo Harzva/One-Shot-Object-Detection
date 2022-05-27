@@ -150,20 +150,31 @@ class _fasterRCNN(nn.Module):
         
         self.match_net = match_block(self.dout_base_model)
 
+        
+        # if len(self.classes)==81:
+        #     self.word_embs = nn.Embedding(1,500)
+        #     self.trans = nn.Linear(500,500)
+        #     self.trans1= nn.Linear(500 + 2048, 2048)
+
         if len(self.classes)==81:
-            self.word_embs = nn.Embedding(201,500)
-            path_word_w2v='./word_w2v.txt'
-            temp_data=data = np.zeros((500,201),dtype=np.float32)
-            temp_word=read_weight(temp_data,path_word_w2v) 
-            self.word_embs.weight.data.copy_(torch.from_numpy(temp_word))
+            self.word_embs = nn.Embedding(len(self.classes)-1,500)
             self.trans = nn.Linear(500,500)
             self.trans1= nn.Linear(500 + 2048, 2048)
+        # if len(self.classes)==81:
+        #     self.word_embs = nn.Embedding(201,500)
+        #     path_word_w2v='./word_w2v.txt'
+        #     temp_data= np.zeros((500,201),dtype=np.float32)
+        #     self.temp_word=read_weight(temp_data,path_word_w2v) 
+        #     self.word_embs.weight.data.copy_(torch.from_numpy(self.temp_word))
+        #     self.trans = nn.Linear(500,500)
+        #     self.trans1= nn.Linear(500 + 2048, 2048)
+        #     self.word_embs.weight.requires_grad=False
         elif len(self.classes)==21:
-            self.word_embs = nn.Embedding(21,300)
-            path_word_w2v='./glove.42B.300d_voc.txt'
-            temp_data=data = np.zeros((21,300),dtype=np.float32)
-            temp_word=read_weight_voc(temp_data,path_word_w2v) 
-            self.word_embs.weight.data.copy_(torch.from_numpy(temp_word))
+            self.word_embs = nn.Embedding(20,300)
+            # path_word_w2v='./glove.42B.300d_voc.txt'
+            # temp_data= np.zeros((20,300),dtype=np.float32)
+            # temp_word=read_weight_voc(temp_data,path_word_w2v) 
+            # self.word_embs.weight.data.copy_(torch.from_numpy(temp_word))
             self.trans = nn.Linear(300,300)
             self.trans1= nn.Linear(300 + 2048, 2048)
 
@@ -204,8 +215,18 @@ class _fasterRCNN(nn.Module):
         num_boxes = num_boxes.data
         query_word_idx = query_word_idx.cuda()
 
+        query_word_vector = self.word_embs(query_word_idx)
+        # query_word_vector = self.word_embs(torch.tensor(0).cuda()).unsqueeze(0).repeat(batch_size,1)#201 里面去自己想要的类 3 300  kanakn zheli当voc的时候you没够取过21  为啥不减一呢
+        # if 200 in query_word_idx:
+        #     raise RuntimeError("Something bad happend")
+        # if self.word_embs.weight.data.cpu().equal(torch.from_numpy(self.temp_word)):
+        #     a=self.word_embs.weight.data.cpu()-torch.from_numpy(self.temp_word)
+        #     print("word_embs相同--------------------")
+        #     print("word_embs相减",a)
 
-        query_word_vector = self.word_embs(query_word_idx)#201 里面去自己想要的类 3 300
+        # else:
+        #     print("word_embs-----butong")
+        # print((self.word_embs.weight.data.cpu()-torch.from_numpy(self.temp_word)).sum(dim=1))
 
         # feed image data to base model to obtain base feature map
         detect_feat = self.RCNN_base(im_data) #torch.Size([3, 1024, 38, 57])=torch.Size([3, 3, 600, 908])   
@@ -289,7 +310,7 @@ class _fasterRCNN(nn.Module):
         # 不更新语义向量直接和视觉向量级联--no work
 
         if self.word_embedding:
-            new_query_word_vector = self.trans(query_word_vector.detach())#更新query  .detach()停止反向传播
+            new_query_word_vector = self.trans(query_word_vector)#更新query  .detach()停止反向传播
             query_feat = torch.cat((query_feat,new_query_word_vector),dim=1)
             query_feat = self.trans1(query_feat)  #融合层
         # =============

@@ -157,7 +157,7 @@ CUDA_VISIBLE_DEVICES=0,1 python trainval_net_gai3.py \
 CUDA_VISIBLE_DEVICES=0,1 python trainval_net_gai3.py \
 --dataset coco --net res50 \
 --bs 16 --nw 4 \
---cuda True --g 1 --seen 1   --mGPUs True --save_dir /home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/models/res50/coco/cls  --word_embedding False
+--cuda True --g 1 --seen 1   --mGPUs True --save_dir ./models/res50/coco/cls  --word_embedding True -r 
 
 CUDA_VISIBLE_DEVICES=0,1 python trainval_net_gai3.py \
 --dataset coco --net res50 \
@@ -210,3 +210,91 @@ git config --local user.name "Harzva"
 git config --local user.email  "626609967@qq.com"
 
 git fetch origin master
+
+CUDA_VISIBLE_DEVICES=0,1 python trainval_net_gai3.py \
+--dataset coco --net res50 \
+--bs 16 --nw 4 \
+--cuda True --g 1 --seen 1   --mGPUs True --save_dir ./models/res50/coco/cls  --word_embedding True --r /media/ubuntu/data1/hzh/One-Shot-Object-Detection/models/res50/coco/cls_coco_bs16_s1_g1/cls_1_4_13311_0.492.pth
+
+
+CUDA_VISIBLE_DEVICES=0,1 python trainval_net_gai3.py \
+--dataset coco --net res50 \
+--bs 16 --nw 8 \
+--cuda True --g 1 --seen 1   --mGPUs True --save_dir ./models/res50/coco/cls_word_embedding_normal  --word_embedding True 
+
+
+test_net_1class_alisure.py step_cls_alisure_epochs10_coco_bs16_s1_g1_noword_10_5140_0.289.pth
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.129
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.238
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.127
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.063
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.143
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.208
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.140
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.283
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.323
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.187
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.359
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.482
+~~~~ Mean and per-category AP @ IoU=[0.50,0.95] ~~~~
+12.9
+person  0.5
+airplane        20.7
+boat    3.8
+parking meter   16.1
+dog     47.6
+elephant        44.5
+backpack        3.9
+suitcase        6.6
+sports ball     7.7
+skateboard      14.0
+wine glass      2.2
+spoon   3.1
+sandwich        23.1
+hot dog 19.0
+chair   1.7
+dining table    2.6
+mouse   9.4
+microwave       14.3
+refrigerator    4.6
+scissors        12.9
+map     12.9
+
+ 
+ python test_net_1.py   step_cls_alisure_epochs10_coco_bs16_s1_g1_noword_10_5140_0.289.pth
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.123
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.228
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.120
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.062
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.137
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.198
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.140
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.283
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.323
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.187
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.359
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.482
+~~~~ Mean and per-category AP @ IoU=[0.50,0.95] ~~~~
+12.3
+person  0.4
+airplane        18.4
+boat    3.4
+parking meter   16.5
+dog     45.8
+elephant        44.7
+backpack        3.8
+suitcase        5.2
+sports ball     6.6
+skateboard      12.9
+wine glass      2.4
+spoon   3.1
+sandwich        20.8
+hot dog 18.6
+chair   1.7
+dining table    2.5
+mouse   9.2
+microwave       13.8
+refrigerator    3.9
+scissors        11.5
+map     12.3

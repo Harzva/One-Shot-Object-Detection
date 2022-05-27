@@ -114,7 +114,7 @@ class roibatchLoader(data.Dataset):
     blobs['gt_boxes'] = [x for x in blobs['gt_boxes'] if x[-1] in self.list_ind]
     
     blobs['gt_boxes'] = np.array(blobs['gt_boxes'])
-    yuancatagory = index
+    
     # query_word_vector = self.word_vectors[0]
     if self.training:
         # Random choice query catgory
@@ -142,6 +142,7 @@ class roibatchLoader(data.Dataset):
         #query_word_vector = self.word_vectors[choice]
     else:
         query = self.load_query(index, minibatch_db[0]['img_id'])
+        yuancatagory = index
         #query_word_vector = self.word_vectors[index]
 
     data = torch.from_numpy(blobs['data'])
@@ -290,15 +291,24 @@ class roibatchLoader(data.Dataset):
 
         #print('yuancat ----',yuancatagory)
         src_name = self.class_to_name[yuancatagory]
+        # if self._num_classes==81:
+        #     if src_name in self.word_name_to_index:
+        #         word_indx = self.word_name_to_index[src_name]##############guanjian
+        #     else:
+        #         raise ValueError("the class of word embedding is not in the imagenet_w2v.tet")
+        #         # word_indx = 0
+
         if self._num_classes==81:
-            if src_name in self.word_name_to_index:
-                word_indx = self.word_name_to_index[src_name]
-            else:
-                raise ValueError("the class of word embedding is not in the imagenet_w2v.tet")
-                # word_indx = 0
+            temp={value:key-1 for key,value in self.class_to_name.items() if value!="__background__" }
+            word_indx=temp[src_name]
+
+            # assert word_indx!=81, 'word_indx 等于 21'
+            # print(word_indx)
         elif self._num_classes==21:
-            temp={value:key for key,value in self.class_to_name.items()}
+            temp={value:key-1 for key,value in self.class_to_name.items() if value!="__background__" }
+            # temp={value:key for key,value in self.class_to_name.items()}
             word_indx = temp[src_name]
+
 
 
         return padding_data, query, im_info, gt_boxes_padding, num_boxes,word_indx
@@ -317,8 +327,9 @@ class roibatchLoader(data.Dataset):
         if self._num_classes==81:
             word_indx = self.word_name_to_index[src_name]
         elif self._num_classes==21:
-            temp={value:key for key,value in self.class_to_name.items()}
+            temp={value:key-1 for key,value in self.class_to_name.items() if value!="__background__" }
             word_indx = temp[src_name]
+
 
 
 

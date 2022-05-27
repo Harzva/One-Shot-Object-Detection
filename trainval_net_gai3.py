@@ -6,7 +6,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import shutil
 import _init_paths
 import os
 import sys
@@ -43,7 +43,13 @@ a
 '''
 # def str2bool(str):
 #     return True if str.lower() == 'true' else False
+def init_seeds(seed=0):
+    torch.manual_seed(seed) # sets the seed for generating random numbers.
+    torch.cuda.manual_seed(seed) # Sets the seed for generating random numbers for the current GPU. It’s safe to call this function if CUDA is not available; in that case, it is silently ignored.
+    torch.cuda.manual_seed_all(seed) # Sets the seed for generating random numbers on all GPUs. It’s safe to call this function if CUDA is not available; in that case, it is silently ignored.
 
+    if seed == 0:
+        torch.backends.cudnn.deterministic = True
 def parse_args():
     """ 
     Parse input arguments
@@ -219,7 +225,7 @@ if __name__ == '__main__':
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs)
     # pprint.pprint(cfg)
-    
+
 
 
     output_dir = args.save_dir+f'_{args.dataset}_bs{args.batch_size}_s{args.session}_g{args.group}'
@@ -227,6 +233,8 @@ if __name__ == '__main__':
         output_dir=output_dir+'_noword'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    shutil.copy("/media/ubuntu/data1/hzh/One-Shot-Object-Detection/lib/model/faster_rcnn/faster_rcnn.py", f"{output_dir}/faster_rcnn.py")
+    shutil.copy(__file__, f'{output_dir}/{os.path.split(__file__)[-1]}')
     if args.use_tfboard:
         from tensorboardX import SummaryWriter
         if 'test' in args.save_dir:
@@ -238,6 +246,7 @@ if __name__ == '__main__':
         logger_summary = SummaryWriter(log_dir=os.path.dirname(log_file))
 
     logger =Tools.get_logger(os.path.basename(output_dir), log_file=log_file,mode='a')
+    init_seeds(cfg.RNG_SEED)
     # np.random.seed(cfg.RNG_SEED)
     # cfg.GPU_ID=args.GPU_ID  if args.GPU_ID  else list(range(torch.cuda.device_count())) 
     cfg['CUDA']=True
@@ -341,16 +350,16 @@ if __name__ == '__main__':
     query_word_vectors = Variable(query_word_vectors)
     # initilize the network here.
     if args.net == 'vgg16':
-        fasterRCNN = vgg16(imdb.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+        fasterRCNN = vgg16(imdb.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res101':
         fasterRCNN = resnet(imdb.classes,101, pretrained=True,
-                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res50':
         fasterRCNN = resnet(imdb.classes, 50, pretrained=True,
-                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res152':
         fasterRCNN = resnet(imdb.classes, 152, pretrained=True,
-                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     else:
         logger.info("network is not defined")
         pdb.set_trace()
@@ -530,7 +539,7 @@ if __name__ == '__main__':
                     save_checkpoint(fasterRCNN.module.state_dict() if args.mGPUs else fasterRCNN.state_dict(), save_name_temp)
                 loss_list.append(loss_temp)
                 if args.resume:
-                    loss_list+=[float('0.'+i[:-4].split('.')[1]) for i in glob.glob(f"{output_dir}/step*.pth")]
+                    loss_list+=[float('0.'+i[:-4].split('.')[0]) for i in glob.glob(f"{output_dir}/step*.pth")]
                 if loss_temp<=min(loss_list):
                     for rm_path in glob.glob(f"{output_dir}/step*.pth"):
                         os.remove(rm_path)

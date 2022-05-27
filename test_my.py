@@ -90,7 +90,7 @@ python test_net_1.py --dataset coco --net res50 \
                       help='set config keys', default=None,
                       nargs=argparse.REMAINDER)
   parser.add_argument('--load_dir', dest='load_dir',
-                      help='directory to load models', default="/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/models/res50/coco/faster_rcnn_4_10_1663.pth",
+                      help='directory to load models', default="./models/res50/coco/faster_rcnn_4_10_1663.pth",
                       type=str)
   # parser.add_argument('--cuda', dest='cuda',
   #                     help='whether use CUDA',
@@ -121,7 +121,7 @@ python test_net_1.py --dataset coco --net res50 \
                       default=1663, type=int)#354981
   parser.add_argument('--path', dest='path',
                       help='checkpoint to load network',
-                      default='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/models/res50/coco/exp3_faster_rcnn_1_1_13311.pth', type=str)#354981
+                      default='./models/res50/coco/exp3_faster_rcnn_1_1_13311.pth', type=str)#354981
   parser.add_argument('--vis', dest='vis',
                       help='visualization mode',
                       action='store_true')
@@ -155,7 +155,7 @@ def temp(args):
     #    imdb, roidb, ratio_list, ratio_index, query, class_to_name = combined_roidb(args.imdb_name, True, seen=args.seen)
     imdb_vu.competition_mode(on=True)
     wi = {}
-    with open('/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/cls_names.txt') as f:
+    with open('./cls_names.txt') as f:
       for i, key in enumerate(f.readlines()):
         wi[key.strip()] = i
     dataset_vu = roibatchLoader(roidb_vu, ratio_list_vu, ratio_index_vu, query_vu, 1, imdb_vu.num_classes, training=False, seen=args.seen, class_to_name=class_to_name,word_name_to_index=wi)

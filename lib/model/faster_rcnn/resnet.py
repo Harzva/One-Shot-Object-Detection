@@ -218,24 +218,24 @@ def resnet152(pretrained=False):
   return model
 
 class resnet(_fasterRCNN):
-  def __init__(self, classes, num_layers=101, pretrained=False, class_agnostic=False,word_embedding=True,model_path=None):
+  def __init__(self, classes, num_layers=101, pretrained=False, class_agnostic=False,word_embedding=True,pre_trained_path=None):
     if num_layers==50:
-      # self.model_path = '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar'
-      self.model_path =model_path# '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/coco_resent50/resnet50.pth'
-      # self.model_path = '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/coco_resent50/checkpoint.pth'
-      #self.model_path = '../data/pretrain_imagenet_resnet50/model_best.pth.tar'
+      # self.pre_trained_path = './data/pre-trained/pretrain_imagenet_resnet50/model_best.pth.tar'
+      self.pre_trained_path =pre_trained_path# './data/pre-trained/coco_resent50/resnet50.pth'
+      # self.pre_trained_path = './data/pre-trained/coco_resent50/checkpoint.pth'
+      #self.pre_trained_path = '../data/pretrain_imagenet_resnet50/model_best.pth.tar'
     elif num_layers==101:
-      self.model_path = '/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/data/pre-trained/pretrain_imagenet_resnet101/model_best.pth.tar'
+      self.pre_trained_path = './data/pre-trained/pretrain_imagenet_resnet101/model_best.pth.tar'
     else:
       raise ValueError("50  or 101")
-      #self.model_path = '../data/pretrain_imagenet_resnet101/model_best.pth.tar'
+      #self.pre_trained_path = '../data/pretrain_imagenet_resnet101/model_best.pth.tar'
     self.dout_base_model = 1024
     self.pretrained = pretrained
 
     self.class_agnostic = class_agnostic
     self.num_layers = num_layers
     super().__init__(classes, class_agnostic,word_embedding)
-    # _fasterRCNN.__init__(self,classes, class_agnostic)#qudiao model_path
+    # _fasterRCNN.__init__(self,classes, class_agnostic)#qudiao pre_trained_path
 
   def _init_modules(self):
     if self.num_layers==50:
@@ -244,11 +244,11 @@ class resnet(_fasterRCNN):
       resnet = resnet101()
 
     if self.pretrained == True:
-      print("Loading pretrained weights from %s" %(self.model_path))
-      state_dict = torch.load(self.model_path)
-      if "BT" not in self.model_path:
+      print("Loading pretrained weights from %s" %(self.pre_trained_path))
+      state_dict = torch.load(self.pre_trained_path)
+      if "BT" not in self.pre_trained_path:
         state_dict = state_dict['state_dict']
-      # with open('/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection-master/resnet50.txt',"w") as f:
+      # with open('./resnet50.txt',"w") as f:
       #   for key, value in state_dict.items():
       #     f.write(f"{key}\t {value.shape}\n")  
       #OrderedDict([('conv1.weight', tensor([[[[-1.5844e-...='cuda:0')), ('bn1.weight', tensor([ 3.4324,  2....='cuda:0')), ('bn1.bias', tensor([ 3.8206,  1....='cuda:0')), ('bn1.running_mean', tensor([ 0.0862, -0....='cuda:0')), ('bn1.running_var', tensor([0.0623, 0.01...='cuda:0')), ('bn1.num_batches_tracked', tensor(307644, devic...='cuda:0')), ('layer1.0.conv1.weight', tensor([[[[-0.2754]]...='cuda:0')), ('layer1.0.bn1.weight', tensor([ 1.9264,  0....='cuda:0')), ('layer1.0.bn1.bias', tensor([-2.2319,  5....='cuda:0')), ('layer1.0.bn1.running_mean', tensor([ -1.5654,   ...='cuda:0')), ('layer1.0.bn1.running_var', tensor([ 29.2059,  3...='cuda:0')), ('layer1.0.bn1.num_bat...es_tracked', tensor(307644, devic...='cuda:0')), ('layer1.0.conv2.weight', tensor([[[[ 0.0483, ...='cuda:0')), ('layer1.0.bn2.weight', tensor([ 5.8823e+00,...='cuda:0')), ...])
@@ -257,7 +257,7 @@ class resnet(_fasterRCNN):
       state_dict_v2 = copy.deepcopy(state_dict)
 
       for key in state_dict:
-        if "BT" not in self.model_path:
+        if "BT" not in self.pre_trained_path:
           pre, post = key.split('module.')
         else:
           post=key

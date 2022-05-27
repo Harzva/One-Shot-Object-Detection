@@ -6,7 +6,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import shutil
 from datasets.imdb import imdb
 import datasets.ds_utils as ds_utils
 from model.utils.config import cfg
@@ -47,8 +47,13 @@ class coco(imdb):
     # class name to cat_id (1~90) 1= person
     self._class_to_coco_cat_id = dict(list(zip([c['name'] for c in cats],
                                                self._COCO.getCatIds())))
+    '''
+    {'person': 1, 'bicycle': 2, 'car': 3, 'motorcycle': 4, 'airplane': 5, 'bus': 6, 'train': 7, 'truck': 8, 'boat': 9, 'traffic light': 10, 'fire hydrant': 11, 'stop sign': 13, 'parking meter': 14, 'bench': 15, 'bird': 16, 'cat': 17, 'dog': 18, 'horse': 19, 'sheep': 20, 'cow': 21, 'elephant': 22, 'bear': 23, 'zebra': 24, 'giraffe': 25, 'backpack': 27, 'umbrella': 28, 'handbag': 31, 'tie': 32, 'suitcase': 33, 'frisbee': 34, 'skis': 35, 'snowboard': 36, 'sports ball': 37, 'kite': 38, 'baseball bat': 39, 'baseball glove': 40, 'skateboard': 41, 'surfboard': 42, 'tennis racket': 43, 'bottle': 44, 'wine glass': 46, 'cup': 47, 'fork': 48, 'knife': 49, 'spoon': 50, 'bowl': 51, 'banana': 52, 'apple': 53, 'sandwich': 54, 'orange': 55, 'broccoli': 56, 'carrot': 57, 'hot dog': 58, 'pizza': 59, 'donut': 60, 'cake': 61, 'chair': 62, 'couch': 63, 'potted plant': 64, 'bed': 65, 'dining table': 67, 'toilet': 70, 'tv': 72, 'laptop': 73, 'mouse': 74, 'remote': 75, 'keyboard': 76, 'cell phone': 77, 'microwave': 78, 'oven': 79, 'toaster': 80, 'sink': 81, 'refrigerator': 82, 'book': 84, 'clock': 85, 'vase': 86, 'scissors': 87, 'teddy bear': 88, 'hair drier': 89, 'toothbrush': 90}  
+    '''
     # Lookup table to map from COCO category ids to our internal class
     # indices
+    '''{1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 13: 12, 14: 13, 15: 14, 16: 15, 17: 16, 18: 17, 19: 18, 20: 19, 21: 20, 22: 21, 23: 22, 24: 23, 25: 24, 27: 25, 28: 26, 31: 27, 32: 28, 33: 29, 34: 30, 35: 31, 36: 32, 37: 33, 38: 34, 39: 35, 40: 36, 41: 37, 42: 38, 43: 39, 44: 40, 46: 41, 47: 42, 48: 43, 49: 44, 50: 45, 51: 46, 52: 47, 53: 48, 54: 49, 55: 50, 56: 51, 57: 52, 58: 53, 59: 54, 60: 55, 61: 56, 62: 57, 63: 58, 64: 59, 65: 60, 67: 61, 70: 62, 72: 63, 73: 64, 74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72, 82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}  
+    '''
     # 1~90 : 1~80
     self.coco_cat_id_to_class_ind = dict([(self._class_to_coco_cat_id[cls],
                                       self._class_to_ind[cls])
@@ -145,10 +150,10 @@ class coco(imdb):
     else:
       file_name = (str(index).zfill(12) + '.jpg')
       
-    # image_path = osp.join(self._data_path, 'images',
-    #                       self._data_name, file_name)
-    image_path = osp.join(self._data_path,
+    image_path = osp.join(self._data_path, 'images',
                           self._data_name, file_name)
+    # image_path = osp.join(self._data_path,
+    #                       self._data_name, file_name)
     assert osp.exists(image_path), \
       'Path does not exist: {}'.format(image_path)
     return image_path
@@ -297,36 +302,100 @@ class coco(imdb):
     print(('~~~~ Mean and per-category AP @ IoU=[{:.2f},{:.2f}] '
            '~~~~').format(IoU_lo_thresh, IoU_hi_thresh))
     print('{:.1f}'.format(100 * ap_default))
-    for cls_ind, cls in enumerate(self.classes):
+
+
+    temp=[self.classes[i] for i in self.inverse_list]
+    aps={}
+    for index, cls in enumerate(temp):
+      index=index+1
+    # for cls_ind, cls in enumerate(self.classes):
       if cls == '__background__':
         continue
       # minus 1 because of __background__
-      precision = coco_eval.eval['precision'][ind_lo:(ind_hi + 1), :, cls_ind - 1, 0, 2]
+      precision = coco_eval.eval['precision'][ind_lo:(ind_hi + 1), :, index - 1, 0, 2]
       ap = np.mean(precision[precision > -1])
-      print('{:.1f}'.format(100 * ap))
+      print('{}\t{:.1f}'.format(cls,100 * ap))
+      aps[cls]=ap
+    meap=100 * np.mean(list(aps.values()))
+    print('map\t{:.1f}'.format(meap))
+    return aps,meap
 
-    print('~~~~ Summary metrics ~~~~')
-    coco_eval.summarize()
+    # print('~~~~ Summary metrics ~~~~')
+    # coco_eval.summarize()
 
   def _do_detection_eval(self, res_file, output_dir):
     ann_type = 'bbox'
+    name_list=['AP0.5:0.95_all_md100','AP0.5_all_md100','AP0.75_all_md100','AP0.5:0.95_small_md100','AP0.5:0.95_mdeium_md100','AP0.5:0.95_lagrge_md100','AR0.5:0.95_all_md1','AR0.5:0.95_all_md10','AR0.5:0.95_all_md100','AR0.5:0.95_small_md100','AR0.5:0.95_medium_md100','AR0.5:0.95_large_md100']
+    dir_name=os.path.dirname(output_dir)
+    pkl_name=os.path.basename(output_dir)
 
-    tmp = [self.coco_cat_id_to_class_ind[i]-1 for i in self.list]
+    # tmp = [self.coco_cat_id_to_class_ind[i]-1 for i in self.list]
 
     coco_dt = self._COCO.loadRes(res_file)
 
     cocoEval = customCOCOeval(self._COCO, coco_dt, "bbox")
     cocoEval.params.imgIds = self._image_index
+    cocoEval.params.catIds =self.list
     cocoEval.evaluate()
     # print(cocoEval.ious)
-    cocoEval.accumulate()
-    cocoEval.summarize(class_index=tmp)
+    cocoEval.accumulate()                
+    # ap_list=cocoEval.summarize(class_index=[i-1 for i in self.inverse_list])
+    ap_list=cocoEval.summarize()
+    aps,meap=self._print_detection_eval_metrics(cocoEval)
+    txt_path = f'{dir_name}/result_save.txt'
+    txt_iner_path = f'{output_dir}/result_save.txt'
+    str_temp1=' |   pkl  |'
+    for i in name_list:
+        str_temp1=str_temp1+f' {i} |'
+
+    str_temp2=f'|{pkl_name}|'
+    for i in ap_list:
+        str_temp2=str_temp2+' {:0.4f} |'.format(i)
+    str_temp2=f'{str_temp2}\n'
+    # print(f'your eval results is at {txt_path}')
+
+    ###per ap
+    temp_cls=list(aps.keys())
+    temp_ap=list(aps.values())
+    str_temp3=' |   pkl  |'
+    for i in temp_cls:
+        str_temp3=str_temp3+f' {i} |'
+    str_temp3=f'{str_temp3}     Mean AP   |\n'
+
+    temp_ap.append(np.mean(ap_list[0]))
+    str_temp4=f'|{pkl_name}|'
+    for i in temp_ap:
+        str_temp4=str_temp4+' {:0.4f} |'.format(i)
+    str_temp4=f'{str_temp4}    {meap}\n'
+    print(f'your eval results is at {txt_path}')
 
 
-    eval_file = osp.join(output_dir, 'detection_results.pkl')
-    with open(eval_file, 'wb') as fid:
-      pickle.dump(cocoEval, fid, pickle.HIGHEST_PROTOCOL)
-    print('Wrote COCO eval results to: {}'.format(eval_file))
+
+
+    txt_file = open(txt_path,'a')
+    txt_file.write('\n')
+    txt_file.write(str_temp1)
+    txt_file.write(str_temp2)
+    txt_file.write(str_temp3)
+    txt_file.write(str_temp4)
+    txt_file.write('\n')
+    txt_file.close()
+
+    txt_file = open(txt_iner_path,'a')
+    txt_file.write('\n')
+    txt_file.write(str_temp1)
+    txt_file.write(str_temp2)
+    txt_file.write(str_temp3)
+    txt_file.write(str_temp4)
+    txt_file.write('\n')
+    txt_file.close()
+
+
+    # eval_file = osp.join(output_dir, 'detection_results.pkl')
+    # with open(eval_file, 'wb') as fid:
+    #   pickle.dump(cocoEval, fid, pickle.HIGHEST_PROTOCOL)
+    # print('Wrote COCO eval results to: {}'.format(eval_file))
+    return ap_list
 
   def _coco_results_one_category(self, boxes, cat_id):
     results = []
@@ -354,20 +423,36 @@ class coco(imdb):
     #   "bbox": [258.15,41.29,348.26,243.78],
     #   "score": 0.236}, ...]
     results = []
-    for cls_ind, cls in enumerate(self.classes):
+    #[self.classes[i] for i in eval_list]
+    # for cls_ind, cls in enumerate(self.classes):
+    temp=[self.classes[i] for i in self.inverse_list]
+    for index, cls in enumerate(temp):
+      index=index+1
       if cls == '__background__':
         continue
-      print('Collecting {} results ({:d}/{:d})'.format(cls, cls_ind,
-                                                       self.num_classes - 1))
+      # print('Collecting {} results ({:d}/{:d})'.format(cls, index,
+      #                                                  self.num_classes - 1))
       coco_cat_id = self._class_to_coco_cat_id[cls]
-      results.extend(self._coco_results_one_category(all_boxes[cls_ind], coco_cat_id))
-    print('Writing results json to {}'.format(res_file))
+      class_ind=self.coco_cat_id_to_class_ind[coco_cat_id]
+      print('Collecting {} results ({:d}/{:d},{:d}/{:d},{:d}/{:d})'.format(cls, index,len(temp),
+                                                  class_ind,80,
+                                                  coco_cat_id,90))
+      results.extend(self._coco_results_one_category(all_boxes[class_ind], coco_cat_id))
+    print('Writing all_boxes results of coco format.json to {}'.format(res_file))
+    if not os.path.exists(os.path.dirname(res_file)):
+      os.makedirs(os.path.dirname(res_file))
     with open(res_file, 'w') as fid:
       json.dump(results, fid)
 
-  def evaluate_detections(self, all_boxes, output_dir):
+  def evaluate_detections(self, all_boxes, output_dir,save_boxes_True,seen):
+    ''' {1: 'person', 5: 'airplane', 9: 'boat', 13: 'parking meter', 17: 'dog', 21: 'elephant', 25: 'backpack', 29: 'suitcase', 33: 'sports ball', 37: 'skateboard', 41: 'wine glass', 45: 'spoon', 49: 'sandwich', 53: 'hot dog', 57: 'chair', 61: 'dining table', 65: 'mouse', 69: 'microwave', 73: 'refrigerator', 77: 'scissors'}
+    {'person': 1, 'bicycle': 2, 'car': 3, 'motorcycle': 4, 'airplane': 5, 'bus': 6, 'train': 7, 'truck': 8, 'boat': 9, 'traffic light': 10, 'fire hydrant': 11, 'stop sign': 13, 'parking meter': 14, 'bench': 15, 'bird': 16, 'cat': 17, 'dog': 18, 'horse': 19, 'sheep': 20, 'cow': 21, 'elephant': 22, 'bear': 23, 'zebra': 24, 'giraffe': 25, 'backpack': 27, 'umbrella': 28, 'handbag': 31, 'tie': 32, 'suitcase': 33, 'frisbee': 34, 'skis': 35, 'snowboard': 36, 'sports ball': 37, 'kite': 38, 'baseball bat': 39, 'baseball glove': 40, 'skateboard': 41, 'surfboard': 42, 'tennis racket': 43, 'bottle': 44, 'wine glass': 46, 'cup': 47, 'fork': 48, 'knife': 49, 'spoon': 50, 'bowl': 51, 'banana': 52, 'apple': 53, 'sandwich': 54, 'orange': 55, 'broccoli': 56, 'carrot': 57, 'hot dog': 58, 'pizza': 59, 'donut': 60, 'cake': 61, 'chair': 62, 'couch': 63, 'potted plant': 64, 'bed': 65, 'dining table': 67, 'toilet': 70, 'tv': 72, 'laptop': 73, 'mouse': 74, 'remote': 75, 'keyboard': 76, 'cell phone': 77, 'microwave': 78, 'oven': 79, 'toaster': 80, 'sink': 81, 'refrigerator': 82, 'book': 84, 'clock': 85, 'vase': 86, 'scissors': 87, 'teddy bear': 88, 'hair drier': 89, 'toothbrush': 90}
+
+    [1, 5, 9, 14, 18, 22, 27, 33, 37, 41, 46, 50, 54, 58, 62, 67, 74, 78, 82, 87]
+    '''
 
 
+    # eval_list=self.filter(seen=seen)
     res_file = osp.join(output_dir, ('detections_' +
                                      self._image_set +
                                      self._year +
@@ -375,20 +460,25 @@ class coco(imdb):
     if self.config['use_salt']:
       res_file += '_{}'.format(str(uuid.uuid4()))
     res_file += '.json'
-    self._write_coco_results_file(all_boxes, res_file)
+    if save_boxes_True:
+      self._write_coco_results_file(all_boxes, res_file)
     # Only do evaluation on non-test sets
     if self._image_set.find('test') == -1:
-      self._do_detection_eval(res_file, output_dir)
+      ap_list=self._do_detection_eval(res_file, output_dir)
     # Optionally cleanup results json file
     if self.config['cleanup']:
-      os.remove(res_file)
+      shutil.rmtree(os.path.dirname(res_file), ignore_errors=True)
+      # os.remove(res_file)
+      
+      # os.removedirs(path) 
+    return ap_list
 
   def competition_mode(self, on):
     if on:
       self.config['use_salt'] = False
       self.config['cleanup'] = False
     else:
-      self.config['use_salt'] = True
+      self.config['use_salt'] = False
       self.config['cleanup'] = True
 
   def filter(self, seen=1):
@@ -515,6 +605,7 @@ class customCOCOeval(COCOeval):
         elif iouType == 'keypoints':
             summarize = _summarizeKps
         self.stats = summarize()
+        return self.stats 
 
-    def __str__(self, cass_index=None):
+    def __str__(self, class_index=None):
         self.summarize(class_index)

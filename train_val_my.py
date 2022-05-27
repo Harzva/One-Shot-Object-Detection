@@ -327,16 +327,16 @@ if __name__ == '__main__':
     query_word_vectors = Variable(query_word_vectors)
     # initilize the network here.
     if args.net == 'vgg16':
-        fasterRCNN = vgg16(imdb.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+        fasterRCNN = vgg16(imdb.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res101':
         fasterRCNN = resnet(imdb.classes,101, pretrained=True,
-                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res50':
         fasterRCNN = resnet(imdb.classes, 50, pretrained=True,
-                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     elif args.net == 'res152':
         fasterRCNN = resnet(imdb.classes, 152, pretrained=True,
-                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                            class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
     else:
         logger.info("network is not defined")
         pdb.set_trace()

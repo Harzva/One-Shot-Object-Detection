@@ -119,7 +119,7 @@ python test_net_1.py --dataset coco --net res50 \
   parser.add_argument('--p', dest='checkpoint',
                       help='checkpoint to load network',
                       default=1663, type=int)#354981
-  parser.add_argument('--m_path', dest='model_path',
+  parser.add_argument('--m_path', dest='pre_trained_path',
                       help='checkpoint to load network',
                       default='/home/ubuntu/Dataset/Partition1/hzh/lj/One-Shot-Object-Detection/models/res50/voc/cls_pascal_voc_bs16_s1_g1/cls_1_10_548.pth', type=str)#354981
   parser.add_argument('--vis', dest='vis',
@@ -273,16 +273,16 @@ if __name__ == '__main__':
   dataset_vu = roibatchLoader(roidb_vu, ratio_list_vu, ratio_index_vu, query_vu, 1, imdb_vu.num_classes, training=False, seen=args.seen, class_to_name=class_to_name,word_name_to_index=wi)
   # initilize the network here.
   if args.net == 'vgg16':
-      fasterRCNN = vgg16(imdb_vu.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+      fasterRCNN = vgg16(imdb_vu.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
   elif args.net == 'res101':
       fasterRCNN = resnet(imdb_vu.classes,101, pretrained=True,
-                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
   elif args.net == 'res50':
       fasterRCNN = resnet(imdb_vu.classes, 50, pretrained=True,
-                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
   elif args.net == 'res152':
       fasterRCNN = resnet(imdb_vu.classes, 152, pretrained=True,
-                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
 
   else:
     print("network is not defined")
@@ -290,7 +290,7 @@ if __name__ == '__main__':
   
   fasterRCNN.create_architecture()
 
-  load_name=args.model_path
+  load_name=args.pre_trained_path
 
   print("load checkpoint %s" % (load_name))
   checkpoint = torch.load(load_name)

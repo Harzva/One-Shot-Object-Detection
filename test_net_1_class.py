@@ -120,9 +120,6 @@ python test_net_1.py --dataset coco --net res50 \
   parser.add_argument('--p', dest='checkpoint',
                       help='checkpoint to load network',
                       default=1663, type=int)#354981
-  parser.add_argument('--m_path', dest='model_path',
-                      help='checkpoint to load network',
-                      default='./models/res50/voc/cls_pascal_voc_bs16_s1_g1/cls_1_10_548.pth', type=str)#354981
   parser.add_argument('--vis', dest='vis',
                       help='visualization mode',
                       action='store_true')
@@ -204,16 +201,16 @@ class Config(object):
   dataset_vu = roibatchLoader(roidb_vu, ratio_list_vu, ratio_index_vu, query_vu, 1, imdb_vu.num_classes, training=False, seen=args.seen, class_to_name=class_to_name,word_name_to_index=wi)
   # initilize the network here.
   if args.net == 'vgg16':
-      fasterRCNN = vgg16(imdb_vu.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+      fasterRCNN = vgg16(imdb_vu.classes, pretrained=True, class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
   elif args.net == 'res101':
       fasterRCNN = resnet(imdb_vu.classes,101, pretrained=True,
-                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
   elif args.net == 'res50':
       fasterRCNN = resnet(imdb_vu.classes, 50, pretrained=True,
-                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
   elif args.net == 'res152':
       fasterRCNN = resnet(imdb_vu.classes, 152, pretrained=True,
-                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,model_path=args.pre_trained_path)
+                          class_agnostic=args.class_agnostic,word_embedding=args.word_embedding,pre_trained_path=args.pre_trained_path)
 
   else:
     print("network is not defined")
@@ -330,12 +327,12 @@ class Testtool(object):
 
     return all_boxes,detect_time,misc_tic
   
-  def math_test(self,load_name=args.model_path,net=None,thresh=0.0,trainval=False,debuging=False):
-    if '.pth' in load_name and net==None:
-      print("load checkpoint %s" % (load_name))
-      checkpoint = torch.load(load_name)
+  def math_test(self,load_dir=args.load_dir,net=None,thresh=0.0,trainval=False,debuging=False):
+    if '.pth' in load_dir and net==None:
+      print("load checkpoint %s" % (load_dir))
+      checkpoint = torch.load(load_dir)
       # print(checkpoint)
-      if 'step'  or ' val'in load_name:
+      if 'step'  or ' val'in load_dir:
         self.fasterRCNN.load_state_dict(checkpoint,False)
       else:
         self.fasterRCNN.load_state_dict(checkpoint['model'],False)
@@ -347,18 +344,18 @@ class Testtool(object):
         cfg.CUDA = True
         self.fasterRCNN.cuda()
         self.fasterRCNN.eval()
-        # output_dir_vu=load_name.replace('models','output')[:-4]
+        # output_dir_vu=load_dir.replace('models','output')[:-4]
         # Tools.makedirs(os.path.dirname(output_dir_vu))
-        output_dir_vu = get_output_dir(self.imdb_vu,os.path.basename(load_name)[:-4])
+        output_dir_vu = get_output_dir(self.imdb_vu,os.path.basename(load_dir)[:-4])
     else:
       self.fasterRCNN=net
       self.fasterRCNN.cuda()
       self.fasterRCNN.eval()
-      output_dir_vu=load_name.replace('models','output')[:-4]
+      output_dir_vu=load_dir.replace('models','output')[:-4]
       # Tools.makedirs(output_dir_vu)
       # if not os.path.exists(output_dir_vu):
       #   os.makedirs(output_dir_vu)
-      output_dir_vu = get_output_dir(self.imdb_vu,os.path.basename(load_name)[:-4])
+      output_dir_vu = get_output_dir(self.imdb_vu,os.path.basename(load_dir)[:-4])
     output_dir_vu=os.path.dirname(output_dir_vu)+'/test/'+ os.path.basename(output_dir_vu) if debuging else output_dir_vu
     # record time
     start = time.time()
@@ -388,13 +385,13 @@ class Testtool(object):
       with open(det_file, 'rb') as fid:
         all_boxes = pickle.load(fid)
     else:
-    # for i,index in enumerate(self.ratio_index_vu[0]):
-    #   data = next(data_iter_vu)
       pbar = tqdm(total=len(dataloader_vu), ncols=50)
       pbar.set_description(f"{args.dataset}_test")
-      for index,data in enumerate(dataloader_vu): #为了多线程 但先在没必要了
-        if index>10:
-          continue
+      for i,index in enumerate(self.ratio_index_vu[0]):
+        data = next(data_iter_vu)
+      # for index,data in enumerate(dataloader_vu): #为了多线程 但先在没必要了
+        # if index>10:
+        #   continue
         all_boxes,detect_time,misc_tic=self.compute_bboxes_all(all_boxes,index,data,max_per_image)
         misc_toc = time.time()
         nms_time = misc_toc - misc_tic
@@ -408,16 +405,32 @@ class Testtool(object):
         print(f'you save all_boxes_det_file as {det_file}')
         pickle.dump(all_boxes, f, pickle.HIGHEST_PROTOCOL)
     print('Evaluating detections')
-    mean_aps_test,ap_dict,rec_dict,prec_dict=self.imdb_vu.evaluate_detections(all_boxes,output_dir_vu,args.seen) 
-    end = time.time()
-    print("test time: %0.4fs" % (end - start))
-    return mean_aps_test,ap_dict,rec_dict,prec_dict
+
+
+    if 'voc' in args.dataset:
+      mean_aps_test,ap_dict,rec_dict,prec_dict=self.imdb_vu.evaluate_detections(all_boxes,output_dir_vu,args.seen) 
+      end = time.time()
+      print("test time: %0.4fs" % (end - start))
+      return mean_aps_test,ap_dict,rec_dict,prec_dict
+    else:
+      save_boxes_True=True
+      ap_list=self.imdb_vu.evaluate_detections(all_boxes,output_dir_vu,save_boxes_True,args.seen)
+      # self.imdb_vu.evaluate_detections(all_boxes,output_dir_vu)
+      
+      end = time.time()
+      print("test time: %0.4fs" % (end - start))
+      return ap_list
+
+    # mean_aps_test,ap_dict,rec_dict,prec_dict=self.imdb_vu.evaluate_detections(all_boxes,output_dir_vu,True,args.seen)
+    # end = time.time()
+    # print("test time: %0.4fs" % (end - start))
+    # return mean_aps_test,ap_dict,rec_dict,prec_dict
 
 
 
 if __name__ == '__main__':
   test_tool=Testtool(Config.fasterRCNN)
-  acc_map=test_tool.math_test(load_name='models/res50/voc/cls_pascal_voc_bs16_s1_g1/step_cls_pascal_voc_bs16_s1_g1_10_30_0.437.pth')
+  acc_map=test_tool.math_test()
   pass
   # args = parse_args()
 
